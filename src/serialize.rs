@@ -21,11 +21,12 @@ use std::io;
 
 use bitcoin::blockdata::script::Script;
 use bitcoin::blockdata::transaction::{SigHashType, Transaction, TxOut};
-use bitcoin::consensus::encode::{self, serialize, Decodable};
+use bitcoin::consensus::encode::{self, Decodable};
+use bitcoin::hashes::hex::ToHex;
 use bitcoin::util::bip32::{ChildNumber, DerivationPath, Fingerprint};
 use bitcoin::util::key::PublicKey;
-use Error;
 
+use Error;
 
 /// Data which can be encoded in a consensus-consistent way
 pub trait Encode {
@@ -93,7 +94,7 @@ impl Serialize for (Fingerprint, DerivationPath) {
         rv.append(&mut self.0.to_bytes().to_vec());
 
         for cnum in self.1.into_iter() {
-            rv.append(&mut serialize(&u32::from(*cnum)))
+            rv.append(&mut bitcoin::consensus::encode::serialize(&u32::from(*cnum)))
         }
 
         rv
@@ -136,7 +137,7 @@ impl Deserialize for Vec<u8> {
 
 impl Serialize for SigHashType {
     fn serialize(&self) -> Vec<u8> {
-        serialize(&self.as_u32())
+        bitcoin::consensus::encode::serialize(&self.as_u32())
     }
 }
 
@@ -151,4 +152,42 @@ impl Deserialize for SigHashType {
             Err(Error::NonStandardSigHashType(raw).into())
         }
     }
+}
+
+/// Encode an object into a vector
+pub fn serialize<T: Encode + ?Sized>(data: &T) -> Vec<u8> {
+    let mut encoder = Vec::new();
+    let len = data.encode(&mut encoder).unwrap();
+    assert_eq!(len, encoder.len());
+    encoder
+}
+
+/// Encode an object into a hex-encoded string
+pub fn serialize_hex<T: Encode + ?Sized>(data: &T) -> String {
+    serialize(data)[..].to_hex()
+}
+
+/// Deserialize an object from a vector, will error if said deserialization
+/// doesn't consume the entire vector.
+pub fn deserialize<T: Decode>(data: &[u8]) -> Result<T, Error> {
+    let (rv, consumed) = deserialize_partial(data)?;
+
+    // Fail if data are not consumed entirely.
+    if consumed == data.len() {
+        Ok(rv)
+    } else {
+        Err(Error::DataNotConsumedEntirely)
+    }
+}
+
+/// Deserialize an object from a vector, but will not report an error if said deserialization
+/// doesn't consume the entire vector.
+pub fn deserialize_partial<T: Decode>(
+    data: &[u8],
+) -> Result<(T, usize), Error> {
+    let mut decoder = io::Cursor::new(data);
+    let rv = Decode::decode(&mut decoder)?;
+    let consumed = decoder.position() as usize;
+
+    Ok((rv, consumed))
 }

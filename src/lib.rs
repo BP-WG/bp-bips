@@ -192,19 +192,18 @@ impl Decode for PartiallySignedTransaction {
 
 #[cfg(test)]
 mod tests {
-    use bitcoin::hashes::hex::FromHex;
-    use bitcoin::Txid;
-
     use std::collections::BTreeMap;
 
     use bitcoin::secp256k1::Secp256k1;
-
+    use bitcoin::hashes::hex::FromHex;
+    use bitcoin::Txid;
     use bitcoin::blockdata::script::Script;
     use bitcoin::blockdata::transaction::{Transaction, TxIn, TxOut, OutPoint};
     use bitcoin::network::constants::Network::Bitcoin;
-    use bitcoin::consensus::encode::{deserialize, serialize, serialize_hex};
     use bitcoin::util::bip32::{ChildNumber, DerivationPath, ExtendedPrivKey, ExtendedPubKey, Fingerprint};
     use bitcoin::util::key::PublicKey;
+
+    use serialize::{deserialize, serialize, serialize_hex};
     use map::{Global, Output};
     use raw;
 
@@ -342,10 +341,10 @@ mod tests {
 
         use bitcoin::hashes::hex::FromHex;
         use bitcoin::hash_types::Txid;
-
         use bitcoin::blockdata::script::Script;
         use bitcoin::blockdata::transaction::{SigHashType, Transaction, TxIn, TxOut, OutPoint};
-        use bitcoin::consensus::encode::serialize_hex;
+
+        use serialize::serialize_hex;
         use map::{Map, Global, Input, Output};
         use raw;
         use super::PartiallySignedTransaction;

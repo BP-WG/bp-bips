@@ -14,8 +14,11 @@
 
 #[allow(unused_macros)]
 macro_rules! hex_psbt {
-    ($s:expr) => { $crate::bitcoin::consensus::deserialize(&<Vec<u8> as $crate::bitcoin::hashes::hex::FromHex>::from_hex($s).unwrap()) };
+    ($s:expr) => { $crate::serialize::deserialize(&<Vec<u8> as $crate::bitcoin::hashes::hex::FromHex>::from_hex($s).unwrap()) };
 }
+
+#[cfg(test)]
+macro_rules! hex_script (($s:expr) => ($crate::bitcoin::blockdata::script::Script::from(<Vec<u8> as $crate::bitcoin::hashes::hex::FromHex>::from_hex($s).unwrap())));
 
 macro_rules! merge {
     ($thing:ident, $slf:ident, $other:ident) => {
