@@ -17,10 +17,12 @@ use std::collections::btree_map::Entry;
 use std::io::{self, Cursor};
 
 use bitcoin::blockdata::transaction::Transaction;
-use bitcoin::consensus::{encode, Encodable, Decodable};
+use bitcoin::consensus::{Encodable, Decodable};
+
 use map::Map;
 use raw;
-use error::Error;
+use Error;
+use serialize::Decode;
 
 /// A key-value map for global data.
 #[derive(Clone, Debug, PartialEq)]
@@ -53,7 +55,7 @@ impl Global {
 }
 
 impl Map for Global {
-    fn insert_pair(&mut self, pair: raw::Pair) -> Result<(), encode::Error> {
+    fn insert_pair(&mut self, pair: raw::Pair) -> Result<(), Error> {
         let raw::Pair {
             key: raw_key,
             value: raw_value,
@@ -70,7 +72,7 @@ impl Map for Global {
         Ok(())
     }
 
-    fn get_pairs(&self) -> Result<Vec<raw::Pair>, encode::Error> {
+    fn get_pairs(&self) -> Result<Vec<raw::Pair>, Error> {
         let mut rv: Vec<raw::Pair> = Default::default();
 
         rv.push(raw::Pair {
@@ -115,14 +117,14 @@ impl Map for Global {
 
 impl_psbtmap_consensus_encoding!(Global);
 
-impl Decodable for Global {
-    fn consensus_decode<D: io::Read>(mut d: D) -> Result<Self, encode::Error> {
+impl Decode for Global {
+    fn decode<D: io::Read>(mut d: D) -> Result<Self, Error> {
 
         let mut tx: Option<Transaction> = None;
         let mut unknowns: BTreeMap<raw::Key, Vec<u8>> = Default::default();
 
         loop {
-            match raw::Pair::consensus_decode(&mut d) {
+            match raw::Pair::decode(&mut d) {
                 Ok(pair) => {
                     match pair.key.type_value {
                         0u8 => {
@@ -144,7 +146,7 @@ impl Decodable for Global {
                                     });
 
                                     if decoder.position() != vlen as u64 {
-                                        return Err(encode::Error::ParseFailed("data not consumed entirely when explicitly deserializing"))
+                                        return Err(Error::DataNotConsumedEntirely)?
                                     }
                                 } else {
                                     return Err(Error::DuplicateKey(pair.key).into())
@@ -159,7 +161,7 @@ impl Decodable for Global {
                         }
                     }
                 }
-                Err(bitcoin::consensus::encode::Error::Psbt(Error::NoMorePairs)) => break,
+                Err(Error::NoMorePairs) => break,
                 Err(e) => return Err(e),
             }
         }

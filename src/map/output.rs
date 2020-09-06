@@ -16,12 +16,11 @@ use std::collections::BTreeMap;
 use std::collections::btree_map::Entry;
 
 use bitcoin::blockdata::script::Script;
-use bitcoin::consensus::encode;
 use bitcoin::util::bip32::{DerivationPath, Fingerprint};
 use bitcoin::util::key::PublicKey;
 use map::Map;
 use raw;
-use error::Error;
+use Error;
 
 /// A key-value map for an output of the corresponding index in the unsigned
 /// transaction.
@@ -39,7 +38,7 @@ pub struct Output {
 }
 
 impl Map for Output {
-    fn insert_pair(&mut self, pair: raw::Pair) -> Result<(), encode::Error> {
+    fn insert_pair(&mut self, pair: raw::Pair) -> Result<(), Error> {
         let raw::Pair {
             key: raw_key,
             value: raw_value,
@@ -70,7 +69,7 @@ impl Map for Output {
         Ok(())
     }
 
-    fn get_pairs(&self) -> Result<Vec<raw::Pair>, encode::Error> {
+    fn get_pairs(&self) -> Result<Vec<raw::Pair>, Error> {
         let mut rv: Vec<raw::Pair> = Default::default();
 
         impl_psbt_get_pair! {

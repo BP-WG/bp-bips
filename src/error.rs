@@ -12,7 +12,6 @@
 // If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 //
 
-use std::error;
 use std::fmt;
 
 use bitcoin::blockdata::transaction::Transaction;
@@ -30,6 +29,8 @@ pub enum Error {
     InvalidKey(raw::Key),
     /// Keys within key-value map should never be duplicated.
     DuplicateKey(raw::Key),
+    /// Invalid pubkey data
+    InvalidPubkey(Vec<u8>),
     /// The scriptSigs for the unsigned transaction must be empty.
     UnsignedTxHasScriptSigs,
     /// The scriptWitnesses for the unsigned transaction must be empty.
@@ -48,6 +49,12 @@ pub enum Error {
     },
     /// Unable to parse as a standard SigHash type.
     NonStandardSigHashType(u32),
+    /// Serialization error in bitcoin consensus-encoded structures
+    ConsensusEncoding(bitcoin::consensus::encode::Error),
+    /// Data not consumed entirely when explicitly deserializing
+    DataNotConsumedEntirely,
+    /// Unexpected end of data found while deserializing
+    UnexpectedEof,
 }
 
 impl fmt::Display for Error {
@@ -55,6 +62,7 @@ impl fmt::Display for Error {
         match *self {
             Error::InvalidKey(ref rkey) => write!(f, "invalid key: {}", rkey),
             Error::DuplicateKey(ref rkey) => write!(f, "duplicate key: {}", rkey),
+            Error::InvalidPubkey(ref bytes) => write!(f, "invalid pubkey data: {:?}", bytes),
             Error::UnexpectedUnsignedTx { expected: ref e, actual: ref a } => write!(f, "different unsigned transaction: expected {}, actual {}", e.txid(), a.txid()),
             Error::NonStandardSigHashType(ref sht) => write!(f, "non-standard sighash type: {}", sht),
             Error::InvalidMagic => f.write_str("invalid magic"),
@@ -65,13 +73,28 @@ impl fmt::Display for Error {
                 f.write_str("partially signed transactions must have an unsigned transaction")
             }
             Error::NoMorePairs => f.write_str("no more key-value pairs for this psbt map"),
+            Error::ConsensusEncoding(ref err) => write!(f, "bitcoin consensus encoding error: {}", err),
+            Error::DataNotConsumedEntirely => f.write_str("data not consumed entirely when explicitly deserializing"),
+            Error::UnexpectedEof => f.write_str("unexpected end of data found while deserializing"),
         }
     }
 }
 
 #[allow(deprecated)]
-impl error::Error for Error {
+impl std::error::Error for Error {
     fn description(&self) -> &str {
         "description() is deprecated; use Display"
+    }
+}
+
+impl From<bitcoin::consensus::encode::Error> for Error {
+    fn from(err: bitcoin::consensus::encode::Error) -> Self {
+        Error::ConsensusEncoding(err)
+    }
+}
+
+impl Into<bitcoin::consensus::encode::Error> for Error {
+    fn into(self) -> bitcoin::consensus::encode::Error {
+        bitcoin::consensus::encode::Error::ParseFailed("PSBT serialization error")
     }
 }

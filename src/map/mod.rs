@@ -12,17 +12,16 @@
 // If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 //
 
-use bitcoin::consensus::encode;
 use raw;
-use error::Error;
+use Error;
 
 /// A trait that describes a PSBT key-value map.
 pub trait Map {
     /// Attempt to insert a key-value pair.
-    fn insert_pair(&mut self, pair: raw::Pair) -> Result<(), encode::Error>;
+    fn insert_pair(&mut self, pair: raw::Pair) -> Result<(), Error>;
 
     /// Attempt to get all key-value pairs.
-    fn get_pairs(&self) -> Result<Vec<raw::Pair>, encode::Error>;
+    fn get_pairs(&self) -> Result<Vec<raw::Pair>, Error>;
 
     /// Attempt to merge with another key-value map of the same type.
     fn merge(&mut self, other: Self) -> Result<(), Error>;

@@ -21,7 +21,9 @@ use std::{fmt, io};
 
 use bitcoin::consensus::encode::{self, Decodable, Encodable, VarInt, MAX_VEC_SIZE};
 use bitcoin::hashes::hex::ToHex;
-use error::Error;
+
+use Error;
+use serialize::{Encode, Decode};
 
 /// A PSBT key in its raw byte form.
 #[derive(Debug, PartialEq, Hash, Eq, Clone, Ord, PartialOrd)]
@@ -52,8 +54,8 @@ impl fmt::Display for Key {
     }
 }
 
-impl Decodable for Key {
-    fn consensus_decode<D: io::Read>(mut d: D) -> Result<Self, encode::Error> {
+impl Decode for Key {
+    fn decode<D: io::Read>(mut d: D) -> Result<Self, Error> {
         let VarInt(byte_size): VarInt = Decodable::consensus_decode(&mut d)?;
 
         if byte_size == 0 {
@@ -63,10 +65,10 @@ impl Decodable for Key {
         let key_byte_size: u64 = byte_size - 1;
 
         if key_byte_size > MAX_VEC_SIZE as u64 {
-            return Err(encode::Error::OversizedVectorAllocation {
+            return Err(Error::ConsensusEncoding(encode::Error::OversizedVectorAllocation {
                 requested: key_byte_size as usize,
                 max: MAX_VEC_SIZE,
-            })
+            }))
         }
 
         let type_value: u8 = Decodable::consensus_decode(&mut d)?;
@@ -83,11 +85,11 @@ impl Decodable for Key {
     }
 }
 
-impl Encodable for Key {
-    fn consensus_encode<S: io::Write>(
+impl Encode for Key {
+    fn encode<S: io::Write>(
         &self,
         mut s: S,
-    ) -> Result<usize, encode::Error> {
+    ) -> Result<usize, Error> {
         let mut len = 0;
         len += VarInt((self.key.len() + 1) as u64).consensus_encode(&mut s)?;
 
@@ -101,20 +103,20 @@ impl Encodable for Key {
     }
 }
 
-impl Encodable for Pair {
-    fn consensus_encode<S: io::Write>(
+impl Encode for Pair {
+    fn encode<S: io::Write>(
         &self,
         mut s: S,
-    ) -> Result<usize, encode::Error> {
-        let len = self.key.consensus_encode(&mut s)?;
+    ) -> Result<usize, Error> {
+        let len = self.key.encode(&mut s)?;
         Ok(len + self.value.consensus_encode(s)?)
     }
 }
 
-impl Decodable for Pair {
-    fn consensus_decode<D: io::Read>(mut d: D) -> Result<Self, encode::Error> {
+impl Decode for Pair {
+    fn decode<D: io::Read>(mut d: D) -> Result<Self, Error> {
         Ok(Pair {
-            key: Decodable::consensus_decode(&mut d)?,
+            key: Decode::decode(&mut d)?,
             value: Decodable::consensus_decode(d)?,
         })
     }

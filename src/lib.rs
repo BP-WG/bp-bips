@@ -49,7 +49,7 @@ pub extern crate bitcoin;
 
 use bitcoin::blockdata::script::Script;
 use bitcoin::blockdata::transaction::Transaction;
-use bitcoin::consensus::{encode, Encodable, Decodable};
+use bitcoin::consensus::{Encodable, Decodable};
 
 use std::io;
 
@@ -62,6 +62,7 @@ pub mod raw;
 mod macros;
 
 pub mod serialize;
+use serialize::{Encode, Decode};
 
 mod map;
 pub use self::map::{Map, Global, Input, Output};
@@ -119,32 +120,32 @@ impl PartiallySignedTransaction {
     }
 }
 
-impl Encodable for PartiallySignedTransaction {
-    fn consensus_encode<S: io::Write>(
+impl Encode for PartiallySignedTransaction {
+    fn encode<S: io::Write>(
         &self,
         mut s: S,
-    ) -> Result<usize, encode::Error> {
+    ) -> Result<usize, Error> {
         let mut len = 0;
         len += b"psbt".consensus_encode(&mut s)?;
 
         len += 0xff_u8.consensus_encode(&mut s)?;
 
-        len += self.global.consensus_encode(&mut s)?;
+        len += self.global.encode(&mut s)?;
 
         for i in &self.inputs {
-            len += i.consensus_encode(&mut s)?;
+            len += i.encode(&mut s)?;
         }
 
         for i in &self.outputs {
-            len += i.consensus_encode(&mut s)?;
+            len += i.encode(&mut s)?;
         }
 
         Ok(len)
     }
 }
 
-impl Decodable for PartiallySignedTransaction {
-    fn consensus_decode<D: io::Read>(mut d: D) -> Result<Self, encode::Error> {
+impl Decode for PartiallySignedTransaction {
+    fn decode<D: io::Read>(mut d: D) -> Result<Self, Error> {
         let magic: [u8; 4] = Decodable::consensus_decode(&mut d)?;
 
         if *b"psbt" != magic {
@@ -155,7 +156,7 @@ impl Decodable for PartiallySignedTransaction {
             return Err(Error::InvalidSeparator.into());
         }
 
-        let global: Global = Decodable::consensus_decode(&mut d)?;
+        let global: Global = Decode::decode(&mut d)?;
 
         let inputs: Vec<Input> = {
             let inputs_len: usize = (&global.unsigned_tx.input).len();
@@ -163,7 +164,7 @@ impl Decodable for PartiallySignedTransaction {
             let mut inputs: Vec<Input> = Vec::with_capacity(inputs_len);
 
             for _ in 0..inputs_len {
-                inputs.push(Decodable::consensus_decode(&mut d)?);
+                inputs.push(Decode::decode(&mut d)?);
             }
 
             inputs
@@ -175,7 +176,7 @@ impl Decodable for PartiallySignedTransaction {
             let mut outputs: Vec<Output> = Vec::with_capacity(outputs_len);
 
             for _ in 0..outputs_len {
-                outputs.push(Decodable::consensus_decode(&mut d)?);
+                outputs.push(Decode::decode(&mut d)?);
             }
 
             outputs

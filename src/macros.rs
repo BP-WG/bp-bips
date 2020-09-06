@@ -35,8 +35,8 @@ macro_rules! impl_psbt_de_serialize {
 macro_rules! impl_psbt_deserialize {
     ($thing:ty) => {
         impl $crate::serialize::Deserialize for $thing {
-            fn deserialize(bytes: &[u8]) -> Result<Self, $crate::bitcoin::consensus::encode::Error> {
-                $crate::bitcoin::consensus::deserialize(&bytes[..])
+            fn deserialize(bytes: &[u8]) -> Result<Self, $crate::Error> {
+                Ok($crate::bitcoin::consensus::deserialize(&bytes[..])?)
             }
         }
     };
@@ -54,14 +54,14 @@ macro_rules! impl_psbt_serialize {
 
 macro_rules! impl_psbtmap_consensus_encoding {
     ($thing:ty) => {
-        impl $crate::bitcoin::consensus::Encodable for $thing {
-            fn consensus_encode<S: ::std::io::Write>(
+        impl $crate::serialize::Encode for $thing {
+            fn encode<S: ::std::io::Write>(
                 &self,
                 mut s: S,
-            ) -> Result<usize, $crate::bitcoin::consensus::encode::Error> {
+            ) -> Result<usize, $crate::Error> {
                 let mut len = 0;
                 for pair in $crate::Map::get_pairs(self)? {
-                    len += $crate::bitcoin::consensus::Encodable::consensus_encode(
+                    len += $crate::serialize::Encode::encode(
                         &pair,
                         &mut s,
                     )?;
@@ -75,16 +75,16 @@ macro_rules! impl_psbtmap_consensus_encoding {
 
 macro_rules! impl_psbtmap_consensus_decoding {
     ($thing:ty) => {
-        impl $crate::bitcoin::consensus::Decodable for $thing {
-            fn consensus_decode<D: ::std::io::Read>(
+        impl $crate::serialize::Decode for $thing {
+            fn decode<D: ::std::io::Read>(
                 mut d: D,
-            ) -> Result<Self, $crate::bitcoin::consensus::encode::Error> {
+            ) -> Result<Self, $crate::Error> {
                 let mut rv: Self = ::std::default::Default::default();
 
                 loop {
-                    match $crate::bitcoin::consensus::Decodable::consensus_decode(&mut d) {
+                    match $crate::serialize::Decode::decode(&mut d) {
                         Ok(pair) => $crate::Map::insert_pair(&mut rv, pair)?,
-                        Err($crate::bitcoin::consensus::encode::Error::Psbt($crate::Error::NoMorePairs)) => return Ok(rv),
+                        Err($crate::Error::NoMorePairs) => return Ok(rv),
                         Err(e) => return Err(e),
                     }
                 }

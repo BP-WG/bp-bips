@@ -24,7 +24,23 @@ use bitcoin::blockdata::transaction::{SigHashType, Transaction, TxOut};
 use bitcoin::consensus::encode::{self, serialize, Decodable};
 use bitcoin::util::bip32::{ChildNumber, DerivationPath, Fingerprint};
 use bitcoin::util::key::PublicKey;
-use error::Error;
+use Error;
+
+
+/// Data which can be encoded in a consensus-consistent way
+pub trait Encode {
+    /// Encode an object with a well-defined format, should only ever error if
+    /// the underlying `Write` errors. Returns the number of bytes written on
+    /// success
+    fn encode<W: io::Write>(&self, e: W) -> Result<usize, Error>;
+}
+
+/// Data which can be encoded in a consensus-consistent way
+pub trait Decode: Sized {
+    /// Decode an object with a well-defined format
+    fn decode<D: io::Read>(d: D) -> Result<Self, Error>;
+}
+
 
 /// A trait for serializing a value as raw data for insertion into PSBT
 /// key-value pairs.
@@ -36,7 +52,7 @@ pub trait Serialize {
 /// A trait for deserializing a value from raw data in PSBT key-value pairs.
 pub trait Deserialize: Sized {
     /// Deserialize a value from raw data.
-    fn deserialize(bytes: &[u8]) -> Result<Self, encode::Error>;
+    fn deserialize(bytes: &[u8]) -> Result<Self, Error>;
 }
 
 impl_psbt_de_serialize!(Transaction);
@@ -50,7 +66,7 @@ impl Serialize for Script {
 }
 
 impl Deserialize for Script {
-    fn deserialize(bytes: &[u8]) -> Result<Self, encode::Error> {
+    fn deserialize(bytes: &[u8]) -> Result<Self, Error> {
         Ok(Self::from(bytes.to_vec()))
     }
 }
@@ -64,9 +80,9 @@ impl Serialize for PublicKey {
 }
 
 impl Deserialize for PublicKey {
-    fn deserialize(bytes: &[u8]) -> Result<Self, encode::Error> {
+    fn deserialize(bytes: &[u8]) -> Result<Self, Error> {
         PublicKey::from_slice(bytes)
-            .map_err(|_| encode::Error::ParseFailed("invalid public key"))
+            .map_err(|_| Error::InvalidPubkey(bytes.to_vec()))
     }
 }
 
@@ -85,9 +101,9 @@ impl Serialize for (Fingerprint, DerivationPath) {
 }
 
 impl Deserialize for (Fingerprint, DerivationPath) {
-    fn deserialize(bytes: &[u8]) -> Result<Self, encode::Error> {
+    fn deserialize(bytes: &[u8]) -> Result<Self, Error> {
         if bytes.len() < 4 {
-            return Err(io::Error::from(io::ErrorKind::UnexpectedEof).into())
+            return Err(Error::UnexpectedEof)
         }
 
         let fprint: Fingerprint = Fingerprint::from(&bytes[0..4]);
@@ -97,7 +113,7 @@ impl Deserialize for (Fingerprint, DerivationPath) {
         while !d.is_empty() {
             match u32::consensus_decode(&mut d) {
                 Ok(index) => dpath.push(index.into()),
-                Err(e) => return Err(e),
+                Err(e) => return Err(Error::ConsensusEncoding(e)),
             }
         }
 
@@ -113,7 +129,7 @@ impl Serialize for Vec<u8> {
 }
 
 impl Deserialize for Vec<u8> {
-    fn deserialize(bytes: &[u8]) -> Result<Self, encode::Error> {
+    fn deserialize(bytes: &[u8]) -> Result<Self, Error> {
         Ok(bytes.to_vec())
     }
 }
@@ -125,7 +141,7 @@ impl Serialize for SigHashType {
 }
 
 impl Deserialize for SigHashType {
-    fn deserialize(bytes: &[u8]) -> Result<Self, encode::Error> {
+    fn deserialize(bytes: &[u8]) -> Result<Self, Error> {
         let raw: u32 = encode::deserialize(bytes)?;
         let rv: SigHashType = SigHashType::from_u32(raw);
 
