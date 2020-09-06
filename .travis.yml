@@ -10,17 +10,24 @@ rust:
   - nightly
   - 1.29.0
 
+# distro: bionic
+
+addons:
+  chrome: stable
+  apt:
+    packages:
+      # - clang-9
+      # - nodejs
+      - binutils-dev
+      - libunwind8-dev
+
 jobs:
   include:
     - rust: stable
       env: FUZZ=true
-    - rust: stable
-      env: WASM=true
+    #- rust: stable
+    #  env: WASM=true
 
-
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y binutils-dev libunwind8-dev nodejs
 
 script:
   - |
@@ -33,6 +40,6 @@ script:
     else
       cargo build --verbose
       cargo test --verbose
-      cargo build --verbose --features "fuzztarget"
-      cargo build --verbose --no-default-features
+      CC=clang-9 cargo build --verbose --features "fuzztarget"
+      CC=clang-9 cargo build --verbose --no-default-features
     fi
