@@ -14,13 +14,11 @@ name = "psbt"
 path = "src/lib.rs"
 
 [features]
+unstable = [] # for benchmarking
+fuzztarget = ["bitcoin/fuzztarget"] # for fuzzified testing, DON'T use for normal builds!
 
 [dependencies]
-
-[dependencies.serde]
-version = "1.0"
-optional = true
-default-features = false
+bitcoin = "0.23.0"
 
 [target.wasm32-unknown-unknown.dev-dependencies]
 wasm-bindgen-test = "0.3"

@@ -1,4 +1,4 @@
-[![Status](https://travis-ci.org/rust-bitcoin/rust-bitcoin.png?branch=master)](https://travis-ci.org/rust-bitcoin/rust-bitcoin)
+[![Status](https://travis-ci.org/rust-bitcoin/rust-psbt.png?branch=master)](https://travis-ci.org/rust-bitcoin/rust-psbt)
 [![Safety Dance](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
 # Rust PSBT Library (partially-signed bitcoin transactions)
