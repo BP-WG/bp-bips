@@ -33,7 +33,6 @@ script:
     else
       cargo build --verbose
       cargo test --verbose
-      cargo test --verbose --features "serde"
       cargo build --verbose --features "fuzztarget"
       cargo build --verbose --no-default-features
     fi
