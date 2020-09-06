@@ -94,7 +94,7 @@ impl Serialize for (Fingerprint, DerivationPath) {
         rv.append(&mut self.0.to_bytes().to_vec());
 
         for cnum in self.1.into_iter() {
-            rv.append(&mut bitcoin::consensus::encode::serialize(&u32::from(*cnum)))
+            rv.append(&mut ::bitcoin::consensus::encode::serialize(&u32::from(*cnum)))
         }
 
         rv
@@ -137,7 +137,7 @@ impl Deserialize for Vec<u8> {
 
 impl Serialize for SigHashType {
     fn serialize(&self) -> Vec<u8> {
-        bitcoin::consensus::encode::serialize(&self.as_u32())
+        ::bitcoin::consensus::encode::serialize(&self.as_u32())
     }
 }
 

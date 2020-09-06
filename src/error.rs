@@ -50,7 +50,7 @@ pub enum Error {
     /// Unable to parse as a standard SigHash type.
     NonStandardSigHashType(u32),
     /// Serialization error in bitcoin consensus-encoded structures
-    ConsensusEncoding(bitcoin::consensus::encode::Error),
+    ConsensusEncoding(::bitcoin::consensus::encode::Error),
     /// Data not consumed entirely when explicitly deserializing
     DataNotConsumedEntirely,
     /// Unexpected end of data found while deserializing
@@ -81,20 +81,20 @@ impl fmt::Display for Error {
 }
 
 #[allow(deprecated)]
-impl std::error::Error for Error {
+impl ::std::error::Error for Error {
     fn description(&self) -> &str {
         "description() is deprecated; use Display"
     }
 }
 
-impl From<bitcoin::consensus::encode::Error> for Error {
-    fn from(err: bitcoin::consensus::encode::Error) -> Self {
+impl From<::bitcoin::consensus::encode::Error> for Error {
+    fn from(err: ::bitcoin::consensus::encode::Error) -> Self {
         Error::ConsensusEncoding(err)
     }
 }
 
-impl Into<bitcoin::consensus::encode::Error> for Error {
-    fn into(self) -> bitcoin::consensus::encode::Error {
-        bitcoin::consensus::encode::Error::ParseFailed("PSBT serialization error")
+impl Into<::bitcoin::consensus::encode::Error> for Error {
+    fn into(self) -> ::bitcoin::consensus::encode::Error {
+        ::bitcoin::consensus::encode::Error::ParseFailed("PSBT serialization error")
     }
 }
