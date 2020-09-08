@@ -167,26 +167,6 @@ impl Map for Input {
 
         Ok(rv)
     }
-
-    fn merge(&mut self, other: Self) -> Result<(), Error> {
-        merge!(non_witness_utxo, self, other);
-
-        if let (&None, Some(witness_utxo)) = (&self.witness_utxo, other.witness_utxo) {
-            self.witness_utxo = Some(witness_utxo);
-            self.non_witness_utxo = None; // Clear out any non-witness UTXO when we set a witness one
-        }
-
-        self.partial_sigs.extend(other.partial_sigs);
-        self.hd_keypaths.extend(other.hd_keypaths);
-        self.unknown.extend(other.unknown);
-
-        merge!(redeem_script, self, other);
-        merge!(witness_script, self, other);
-        merge!(final_script_sig, self, other);
-        merge!(final_script_witness, self, other);
-
-        Ok(())
-    }
 }
 
 impl_psbtmap_consensus_enc_dec_oding!(Input);

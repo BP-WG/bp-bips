@@ -101,18 +101,6 @@ impl Map for Global {
 
         Ok(rv)
     }
-
-    fn merge(&mut self, other: Self) -> Result<(), Error> {
-        if self.unsigned_tx != other.unsigned_tx {
-            return Err(Error::UnexpectedUnsignedTx {
-                expected: self.unsigned_tx.clone(),
-                actual: other.unsigned_tx,
-            });
-        }
-
-        self.unknown.extend(other.unknown);
-        Ok(())
-    }
 }
 
 impl_psbtmap_consensus_encoding!(Global);

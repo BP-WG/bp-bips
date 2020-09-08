@@ -93,16 +93,6 @@ impl Map for Output {
 
         Ok(rv)
     }
-
-    fn merge(&mut self, other: Self) -> Result<(), Error> {
-        self.hd_keypaths.extend(other.hd_keypaths);
-        self.unknown.extend(other.unknown);
-
-        merge!(redeem_script, self, other);
-        merge!(witness_script, self, other);
-
-        Ok(())
-    }
 }
 
 impl_psbtmap_consensus_enc_dec_oding!(Output);
