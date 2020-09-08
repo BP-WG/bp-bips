@@ -21,6 +21,7 @@ use bitcoin::util::key::PublicKey;
 use map::Map;
 use raw;
 use Error;
+use raw::ProprietaryKey;
 
 /// A key-value map for an output of the corresponding index in the unsigned
 /// transaction.
@@ -34,7 +35,7 @@ pub struct Output {
     /// corresponding master key fingerprints and derivation paths.
     pub hd_keypaths: BTreeMap<PublicKey, (Fingerprint, DerivationPath)>,
     /// Unknown key-value pairs for this output.
-    pub unknown: BTreeMap<raw::Key, Vec<u8>>,
+    pub unknown: BTreeMap<raw::ProprietaryKey, Vec<u8>>,
 }
 
 impl Map for Output {
@@ -60,9 +61,9 @@ impl Map for Output {
                     self.hd_keypaths <= <raw_key: PublicKey>|<raw_value: (Fingerprint, DerivationPath)>
                 }
             }
-            _ => match self.unknown.entry(raw_key) {
+            _ => match self.unknown.entry(ProprietaryKey::from_key(raw_key.clone())?) {
                     Entry::Vacant(empty_key) => {empty_key.insert(raw_value);},
-                    Entry::Occupied(k) => return Err(Error::DuplicateKey(k.key().clone()).into()),
+                    Entry::Occupied(k) => return Err(Error::DuplicateKey(raw_key).into()),
             }
         }
 
@@ -86,7 +87,7 @@ impl Map for Output {
 
         for (key, value) in self.unknown.iter() {
             rv.push(raw::Pair {
-                key: key.clone(),
+                key: key.clone().into_key(),
                 value: value.clone(),
             });
         }

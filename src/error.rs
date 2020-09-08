@@ -27,6 +27,8 @@ pub enum Error {
     InvalidSeparator,
     /// Known keys must be according to spec.
     InvalidKey(raw::Key),
+    /// Non-proprietary key type found when proprietary key was expected
+    InvalidProprietaryKey,
     /// Keys within key-value map should never be duplicated.
     DuplicateKey(raw::Key),
     /// Invalid pubkey data
@@ -61,6 +63,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Error::InvalidKey(ref rkey) => write!(f, "invalid key: {}", rkey),
+            Error::InvalidProprietaryKey => write!(f, "non-proprietary key type found when proprietary key was expected"),
             Error::DuplicateKey(ref rkey) => write!(f, "duplicate key: {}", rkey),
             Error::InvalidPubkey(ref bytes) => write!(f, "invalid pubkey data: {:?}", bytes),
             Error::UnexpectedUnsignedTx { expected: ref e, actual: ref a } => write!(f, "different unsigned transaction: expected {}, actual {}", e.txid(), a.txid()),
@@ -84,6 +87,12 @@ impl fmt::Display for Error {
 impl ::std::error::Error for Error {
     fn description(&self) -> &str {
         "description() is deprecated; use Display"
+    }
+}
+
+impl From<::std::io::Error> for Error {
+    fn from(err: ::std::io::Error) -> Self {
+        Error::ConsensusEncoding(::bitcoin::consensus::encode::Error::Io(err))
     }
 }
 

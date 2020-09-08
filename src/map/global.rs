@@ -31,7 +31,7 @@ pub struct Global {
     /// empty.
     pub unsigned_tx: Transaction,
     /// Unknown global key-value pairs.
-    pub unknown: BTreeMap<raw::Key, Vec<u8>>,
+    pub unknown: BTreeMap<raw::ProprietaryKey, Vec<u8>>,
 }
 
 impl Global {
@@ -63,9 +63,9 @@ impl Map for Global {
 
         match raw_key.type_value {
             0u8 => return Err(Error::DuplicateKey(raw_key).into()),
-            _ => match self.unknown.entry(raw_key) {
+            _ => match self.unknown.entry(raw::ProprietaryKey::from_key(raw_key.clone())?) {
                 Entry::Vacant(empty_key) => {empty_key.insert(raw_value);},
-                Entry::Occupied(k) => return Err(Error::DuplicateKey(k.key().clone()).into()),
+                Entry::Occupied(k) => return Err(Error::DuplicateKey(raw_key).into()),
             }
         }
 
@@ -94,7 +94,7 @@ impl Map for Global {
 
         for (key, value) in self.unknown.iter() {
             rv.push(raw::Pair {
-                key: key.clone(),
+                key: key.clone().into_key(),
                 value: value.clone(),
             });
         }
@@ -109,7 +109,7 @@ impl Decode for Global {
     fn decode<D: io::Read>(mut d: D) -> Result<Self, Error> {
 
         let mut tx: Option<Transaction> = None;
-        let mut unknowns: BTreeMap<raw::Key, Vec<u8>> = Default::default();
+        let mut unknowns: BTreeMap<raw::ProprietaryKey, Vec<u8>> = Default::default();
 
         loop {
             match raw::Pair::decode(&mut d) {
@@ -143,9 +143,9 @@ impl Decode for Global {
                                 return Err(Error::InvalidKey(pair.key).into())
                             }
                         }
-                        _ => match unknowns.entry(pair.key) {
+                        _ => match unknowns.entry(raw::ProprietaryKey::from_key(pair.key.clone())?) {
                             Entry::Vacant(empty_key) => {empty_key.insert(pair.value);},
-                            Entry::Occupied(k) => return Err(Error::DuplicateKey(k.key().clone()).into()),
+                            Entry::Occupied(k) => return Err(Error::DuplicateKey(pair.key).into()),
                         }
                     }
                 }

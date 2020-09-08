@@ -19,11 +19,11 @@
 
 use std::{fmt, io};
 
-use bitcoin::consensus::encode::{self, Decodable, Encodable, VarInt, MAX_VEC_SIZE};
+use bitcoin::consensus::encode::{self, ReadExt, WriteExt, Decodable, Encodable, VarInt, MAX_VEC_SIZE};
 use bitcoin::hashes::hex::ToHex;
 
 use Error;
-use serialize::{Encode, Decode};
+use serialize::{Encode, Decode, serialize, deserialize};
 
 /// A PSBT key in its raw byte form.
 #[derive(Debug, PartialEq, Hash, Eq, Clone, Ord, PartialOrd)]
@@ -41,6 +41,16 @@ pub struct Pair {
     pub key: Key,
     /// The value of this key-value pair in raw byte form.
     pub value: Vec<u8>,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+pub struct ProprietaryType;
+
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+pub struct ProprietaryKey<Subtype = ProprietaryType> where Subtype: Copy + From<u8> + Into<u8> {
+    pub prefix: Vec<u8>,
+    pub subtype: Subtype,
+    pub key: Vec<u8>,
 }
 
 impl fmt::Display for Key {
@@ -119,5 +129,61 @@ impl Decode for Pair {
             key: Decode::decode(&mut d)?,
             value: Decodable::consensus_decode(d)?,
         })
+    }
+}
+
+impl From<u8> for ProprietaryType {
+    fn from(_: u8) -> Self {
+        ProprietaryType
+    }
+}
+
+impl Into<u8> for ProprietaryType {
+    fn into(self) -> u8 {
+        0u8
+    }
+}
+
+impl<Subtype> Encode for ProprietaryKey<Subtype> where Subtype: Copy + From<u8> + Into<u8> {
+    fn encode<W: io::Write>(&self, mut e: W) -> Result<usize, Error> {
+        let mut len = self.prefix.consensus_encode(&mut e)? + 1;
+        e.emit_u8(self.subtype.into())?;
+        len += e.write(&self.key)?;
+        Ok(len)
+    }
+}
+
+impl<Subtype> Decode for ProprietaryKey<Subtype> where Subtype: Copy + From<u8> + Into<u8> {
+    fn decode<D: io::Read>(mut d: D) -> Result<Self, Error> {
+        let VarInt(prefix_size) = VarInt::consensus_decode(&mut d)?;
+
+        let mut prefix = vec![0u8; prefix_size as usize];
+        let mut key = vec![];
+        d.read_exact(&mut prefix)?;
+        let subtype = Subtype::from(d.read_u8()?);
+        d.read_to_end(&mut key)?;
+
+        Ok(ProprietaryKey {
+            prefix,
+            subtype,
+            key
+        })
+    }
+}
+
+impl<Subtype> ProprietaryKey<Subtype> where Subtype: Copy + From<u8> + Into<u8> {
+    pub fn from_key(key: Key) -> Result<Self, Error> {
+        if key.type_value != 0xFC {
+            return Err(Error::InvalidProprietaryKey)
+        }
+
+        deserialize(&key.key)
+    }
+
+    pub fn into_key(self) -> Key {
+        Key {
+            type_value: 0xFC,
+            key: serialize(&self)
+        }
     }
 }

@@ -37,6 +37,7 @@
 #![deny(unused_mut)]
 #![deny(dead_code)]
 #![deny(unused_imports)]
+// TODO: Uncomment for the first release
 //#![deny(missing_docs)]
 
 // In general, rust is absolutely horrid at supporting users doing things like,
