@@ -1,4 +1,4 @@
-// Rust Bitcoin Library
+// Rust PSBT Library
 // Written by
 //   The Rust Bitcoin developers
 //
