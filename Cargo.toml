@@ -1,9 +1,9 @@
 [package]
 name = "psbt"
-version = "0.1.0-beta-1"
+version = "0.1.0-alpha.1"
 authors = ["Dr. Maxim Orlovsky <orlovsky@pandoracore.com>"]
 license = "CC0-1.0"
-description = "Rust crates implementing partially-signed bitcoin transactions spec (BIP-174), as a library and small command-line tool, supporting rustc 1.29.0"
+description = "Rust crates implementing partially-signed bitcoin transactions spec (BIP-174), as a library and a command-line tool"
 documentation = "https://docs.rs/psbt/"
 keywords = [ "crypto", "bitcoin", "psbt" ]
 categories = [ "cryptography::cryptocurrencies", "data-structures", "wasm" ]
@@ -18,7 +18,7 @@ unstable = [] # for benchmarking
 fuzztarget = ["bitcoin/fuzztarget"] # for fuzzified testing, DON'T use for normal builds!
 
 [dependencies]
-bitcoin = "0.23.0"
+bitcoin = "~0.25.0"
 
 [target.wasm32-unknown-unknown.dev-dependencies]
 wasm-bindgen-test = "0.3"
