@@ -14,13 +14,54 @@ name = "psbt"
 path = "src/lib.rs"
 
 [features]
+default = ["std", "serde"]
+all = ["std", "serde", "async", "cli"]
+std = []
+# Used to build command-line tool
+cli = ["serde", "serde_yaml", "serde_json", "toml"]
+serde = ["serde_crate", "serde_with", "amplify/serde", "bitcoin/use-serde"]
+async = []
 unstable = [] # for benchmarking
-fuzztarget = ["bitcoin/fuzztarget"] # for fuzzified testing, DON'T use for normal builds!
+# For fuzzified testing, DON'T use for normal builds!
+fuzztarget = ["bitcoin/fuzztarget"]
 
+# Dependencies
+# ============
+#
+# Version policy
+# --------------
+# The policy in specifying dependencies versions are to use tilde requirements
+# according to
+# <https://doc.rust-lang.org/nightly/cargo/reference/specifying-dependencies.html?highlight=feature#tilde-requirements>
+# with full semver version specification (major, minor and patch components)
+# which means that we may upgrade for patches/bugfixes, but must not change
+# even the minor version of the package.
+# Once the library is stable consider upgrading tilde requirements to strict
+# equivalence requirements (with '=' sign) since even dependencies patching will
+# not introduce risk of breaking the consensus and even security updates must
+# be done manualy after through testing
 [dependencies]
-amplify = "~1.2.0"
+# Dependencies on other LNP/BP repositories
+# -----------------------------------------
+amplify = "~1.2.0" # This project does not have any non-optional dependencies
 amplify_derive = "~1.2.0"
+# Dependencies on core rust-bitcoin ecosystem projects
+# ----------------------------------------------------
 bitcoin = "~0.25.0"
+# Serialization
+# ------------------
+#   This strange naming is a workaround for cargo inability to define required
+#   features for a dependency. See
+#   <https://github.com/rust-lang/api-guidelines/issues/180> for the explanation
+#   and references.
+serde_crate = { package = "serde", version = "~1.0.106", features = ["derive"], optional = true }
+serde_with = { version = "~1.5.1", optional = true }
+serde_json = { version = "~1.0.55", optional = true } # Used by cli only
+serde_yaml = { version = "~0.8.13", optional = true } # Used by cli only
+toml = { version = "~0.5.6", optional = true } # Used by cli only
+
+[dev-dependencies]
+bitcoin = { version = "~0.25.0", features = ["rand"] }
 
 [target.wasm32-unknown-unknown.dev-dependencies]
 wasm-bindgen-test = "0.3"
