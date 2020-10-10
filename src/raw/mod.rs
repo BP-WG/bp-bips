@@ -9,24 +9,13 @@
 // You should have received a copy of the Apache License version 2.0 along with
 // this software. If not, see <https://opensource.org/licenses/Apache-2.0>.
 
-//! # Partially Signed Transactions
-//!
-//! Implementation of BIP174 Partially Signed Bitcoin Transaction Format as
-//! defined at https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki
-//! except we define PSBTs containing non-standard SigHash types as invalid.
+//! Types, traits & implementations for data structures and interfaces
+//! underlying BIP-174 partially-signed bitcoin transaction standard. These
+//! types are more generic and can be used outside of the VIP-174 scope for
+//! serialization and storage of generic complex key-value maps.
 
-#![recursion_limit = "256"]
-#![deny(
-    non_upper_case_globals,
-    non_camel_case_types,
-    non_snake_case,
-    unused_mut,
-    unused_imports,
-    dead_code,
-    missing_docs,
-    warnings
-)]
-
-pub mod bip32;
-pub mod map;
-pub mod raw;
+mod error;
+mod proprietary_key;
+mod typed_key;
+mod typed_map;
+mod typed_pair;

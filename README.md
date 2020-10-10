@@ -1,11 +1,12 @@
 [![crates.io](https://meritbadge.herokuapp.com/psbt)](https://crates.io/crates/psbt)
 [![Docs](https://docs.rs/psbt/badge.svg)](https://docs.rs/psbt)
+[![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ![Build](https://github.com/LNP-BP/rust-psbt/workflows/Build/badge.svg)
 ![Tests](https://github.com/LNP-BP/rust-psbt/workflows/Tests/badge.svg)
 ![Lints](https://github.com/LNP-BP/rust-psbt/workflows/Lints/badge.svg)
 [![codecov](https://codecov.io/gh/LNP-BP/rust-psbt/branch/master/graph/badge.svg)](https://codecov.io/gh/LNP-BP/rust-psbt)
-[![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # Rust PSBT Library (partially-signed bitcoin transactions)
 
