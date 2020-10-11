@@ -8,6 +8,7 @@ documentation = "https://docs.rs/psbt/"
 keywords = [ "crypto", "bitcoin", "psbt" ]
 categories = [ "cryptography::cryptocurrencies", "data-structures", "wasm" ]
 readme = "README.md"
+edition = "2018"
 
 [lib]
 name = "psbt"

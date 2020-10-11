@@ -27,6 +27,10 @@
     warnings
 )]
 
+#[macro_use]
+extern crate amplify_derive;
+
 pub mod bip32;
+pub mod encoding;
 pub mod map;
 pub mod raw;

@@ -8,3 +8,5 @@
 //
 // You should have received a copy of the Apache License version 2.0 along with
 // this software. If not, see <https://opensource.org/licenses/Apache-2.0>.
+
+//! Per-output typed map from PSBT

@@ -10,3 +10,10 @@
 // this software. If not, see <https://opensource.org/licenses/Apache-2.0>.
 
 //! Data type of BPST key-value maps used by BIP-174
+
+use std::collections::HashMap;
+
+use crate::raw::typed_key::TypedKey;
+
+/// Key-value map required for PSBT, as it is defined in BIP-177.
+pub type TypedMap<TypeSystem, Value> = HashMap<TypedKey<TypeSystem>, Value>;

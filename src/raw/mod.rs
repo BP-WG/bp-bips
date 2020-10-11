@@ -19,3 +19,6 @@ mod proprietary_key;
 mod typed_key;
 mod typed_map;
 mod typed_pair;
+
+pub use typed_key::TypedKey;
+pub use typed_map::TypedMap;
