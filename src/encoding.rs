@@ -15,8 +15,7 @@
 use std::io;
 
 /// Errors from PSBT data structure deserialization
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Display, Error, From)]
-#[display(Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum DataError {}
 
 /// Encodes PSBT data structure according to BIP-174 rules
