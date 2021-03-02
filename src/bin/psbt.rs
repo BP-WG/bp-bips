@@ -20,7 +20,8 @@ use std::str::FromStr;
 use bech32::{FromBase32, ToBase32};
 use bitcoin::consensus::{deserialize, serialize, Decodable, Encodable};
 use bitcoin::hashes::hex::{self, FromHex, ToHex};
-use bitcoin::util::psbt::PartiallySignedTransaction;
+
+use psbt::v1::Psbt;
 
 #[derive(Clap, Clone, Debug)]
 #[clap(
@@ -230,7 +231,7 @@ fn main() -> Result<(), String> {
             input,
             output,
         } => {
-            let psbt: PartiallySignedTransaction = input_read(psbt, input)?;
+            let psbt: Psbt = input_read(psbt, input)?;
             output_write(io::stdout(), psbt, output)?;
         }
         Command::Sign {

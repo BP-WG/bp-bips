@@ -27,7 +27,5 @@
     warnings
 )]
 
-pub mod bip32;
-pub mod encoding;
-pub mod map;
-pub mod raw;
+pub mod v1;
+pub mod v2;

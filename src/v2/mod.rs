@@ -9,4 +9,12 @@
 // You should have received a copy of the Apache License version 2.0 along with
 // this software. If not, see <https://opensource.org/licenses/Apache-2.0>.
 
-//! Extended public key implementation after BIP-32 standard
+//! # Partially Signed Transactions
+//!
+//! Implementation of BIP174 Partially Signed Bitcoin Transaction Format as
+//! defined at https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki
+//! except we define PSBTs containing non-standard SigHash types as invalid.
+
+pub mod encoding;
+pub mod map;
+pub mod raw;

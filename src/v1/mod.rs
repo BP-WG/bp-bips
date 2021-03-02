@@ -9,8 +9,14 @@
 // You should have received a copy of the Apache License version 2.0 along with
 // this software. If not, see <https://opensource.org/licenses/Apache-2.0>.
 
-//! Module contains more generic implementation of BIP-32 standard that the one
-//! found in rust-bitcoin
+//! # Partially Signed Transactions
+//!
+//! Implementation of BIP174 Partially Signed Bitcoin Transaction Format as
+//! defined at https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki
+//! except we define PSBTs containing non-standard SigHash types as invalid.
 
-mod xprv;
-mod xpub;
+pub use bitcoin::util::psbt::PartiallySignedTransaction as Psbt;
+pub use bitcoin::util::psbt::{
+    raw, raw::ProprietaryKey, raw::ProprietaryType, Error, Global, Input, Map,
+    Output,
+};
