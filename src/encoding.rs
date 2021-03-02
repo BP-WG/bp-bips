@@ -21,8 +21,13 @@ pub enum DataError {}
 
 /// Encodes PSBT data structure according to BIP-174 rules
 pub trait Bip174Encode {
-    /// Writes binary data to `writer`
-    fn bip174_encode(&self) -> Result<usize, io::Error>;
+    /// Encode an object with a well-defined format, should only ever error if
+    /// the underlying `Write` errors. Returns the number of bytes written on
+    /// success
+    fn bip174_encode<W: io::Write>(
+        &self,
+        writer: W,
+    ) -> Result<usize, io::Error>;
 }
 
 /// Decodes PSBT data structure
@@ -30,6 +35,6 @@ pub trait Bip174Decode
 where
     Self: Sized,
 {
-    /// Reads binary data from `reader`
-    fn bip174_decode() -> Result<Self, DataError>;
+    /// Decode an object with a well-defined format from `reader`
+    fn bip174_decode<R: io::Read>(reader: R) -> Result<Self, DataError>;
 }
