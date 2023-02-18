@@ -6,41 +6,49 @@ pub use encoding::{DecodeError, Encoding};
 
 use core::marker::PhantomData;
 
-pub trait KnownKey {}
+pub trait KnownPair {}
 
-pub enum InKey {}
-impl KnownKey for InKey {}
+pub enum InPair {}
+impl KnownPair for InPair {}
 
-pub enum OutKey {}
-impl KnownKey for OutKey {}
+pub enum OutPair {}
+impl KnownPair for OutPair {}
 
-pub enum GlobalKey {}
-impl KnownKey for GlobalKey {}
+pub enum GlobalPair {
+    UnsignedTx(Tx),
+    Xpub(XpubDerivation),
+    TxVersion(u32 /* TxVer must become u32-representable */),
+    InputCount(u64),
+    OutputCount(u64),
+    TxModifiable(u8),
+    Version(u32),
+}
+impl KnownPair for GlobalPair {}
 
-pub struct UnknownKey<T: KnownKey>(u64, PhantomData<T>);
+pub struct UnknownPair<T: KnownPair> {
+    key_type: u64,
+    key_data: Vec<u8>,
+    value: Vec<u8>,
+    _map_type: PhantomData<T>,
+}
 
-pub struct ProprietaryKey {
+pub struct ProprietaryPair {
     pub identifier: String,
-    pub subtype: u64,
-}
-impl KnownKey for ProprietaryKey {}
-
-pub struct Psbt {
-    global: KeyMap<GlobalKey>,
-    inputs: Vec<KeyMap<InKey>>,
-    outputs: Vec<KeyMap<OutKey>>,
-}
-
-pub struct KeyMap<T: KnownKey>(Vec<KeyPair<T>>);
-
-pub struct KeyPair<T: KnownKey> {
-    pub key_type: KeyType<T>,
-    pub key_data: Vec<u8>,
+    pub subkey_type: u64,
+    pub subkey_data: Vec<u8>,
     pub value: Vec<u8>
 }
 
-pub enum KeyType<T: KnownKey> {
+pub struct Psbt {
+    global: KeyMap<GlobalPair>,
+    inputs: Vec<KeyMap<InPair>>,
+    outputs: Vec<KeyMap<OutPair>>,
+}
+
+pub struct KeyMap<T: KnownPair>(Vec<KeyPair<T>>);
+
+pub enum KeyPair<T: KnownPair> {
     Known(T),
-    Unknown(UnknownKey<T>),
-    Proprietary(ProprietaryKey),
+    Unknown(UnknownPair<T>),
+    Proprietary(ProprietaryPair),
 }
