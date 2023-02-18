@@ -1,18 +1,25 @@
 //! Zero-dependency no-std 100% standard-compliant PSBT v0 and v2 implementation.
 
-pub trait PsbtKeyType {}
+use core::marker::PhantomData;
+
+pub trait KnownKey {}
 
 pub enum InKey {}
-impl PsbtKeyType for InKey {}
+impl KnownKey for InKey {}
 
 pub enum OutKey {}
-impl PsbtKeyType for OutKey {}
+impl KnownKey for OutKey {}
 
 pub enum GlobalKey {}
-impl PsbtKeyType for GlobalKey {}
+impl KnownKey for GlobalKey {}
 
-pub struct UnknownKey(u64);
-impl PsbtKeyType for UnknownKey {}
+pub struct UnknownKey<T: KnownKey>(u64, PhantomData<T>);
+
+pub struct ProprietaryKey {
+    pub identifier: String,
+    pub subtype: u64,
+}
+impl KnownKey for ProprietaryKey {}
 
 pub struct Psbt {
     global: KeyMap<GlobalKey>,
@@ -20,29 +27,16 @@ pub struct Psbt {
     outputs: Vec<KeyMap<OutKey>>,
 }
 
-pub struct KeyMap<T: PsbtKeyType>(Vec<KeyPair<T>>);
+pub struct KeyMap<T: KnownKey>(Vec<KeyPair<T>>);
 
-pub struct KeyPair<T: PsbtKeyType> {
-    pub key: Key<T>,
+pub struct KeyPair<T: KnownKey> {
+    pub key_type: KeyType<T>,
+    pub key_data: Vec<u8>,
     pub value: Vec<u8>
 }
 
-pub enum Key<T: PsbtKeyType> {
-    Known(CommonKey<T>),
-    Unknown(CommonKey<UnknownKey>),
+pub enum KeyType<T: KnownKey> {
+    Known(T),
+    Unknown(UnknownKey<T>),
     Proprietary(ProprietaryKey),
-}
-
-pub struct CommonKey<T: PsbtKeyType> {
-    pub key_type: T,
-    pub key_data: Vec<u8>,
-}
-
-pub struct ProprietaryKey {
-    pub identifier: String,
-    pub subtype: u64,
-    pub key_data: Vec<u8>,
-}
-
-pub enum KeyType {
 }
