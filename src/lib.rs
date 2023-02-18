@@ -1,5 +1,9 @@
 //! Zero-dependency no-std 100% standard-compliant PSBT v0 and v2 implementation.
 
+mod encoding;
+
+pub use encoding::{DecodeError, Encoding};
+
 use core::marker::PhantomData;
 
 pub trait KnownKey {}
