@@ -1,0 +1,16 @@
+[package]
+name = "psbt"
+version = "0.10.0"
+description = "Partially signed bitcoin transaction library (BIP174, BIP370, BIP371)"
+keywords = ["bitcoin", "wallet", "bip174", "psbt", "taproot"]
+categories = ["cryptography::cryptocurrencies", "encoding", "parsing"]
+readme = "README.md"
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+
+[dependencies]
+amplify = { workspace = true }
