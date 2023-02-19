@@ -1,9 +1,10 @@
 [package]
 name = "bitcoin_hd"
 version = "0.10.0"
-readme = "README.md"
+description = "Bitcoin hierarchical deterministic derivation library"
 keywords = ["bitcoin", "wallet", "hd-wallet", "bip32", "bip44"]
 categories = ["cryptography::cryptocurrencies", "encoding", "parsing"]
+readme = "README.md"
 authors = { workspace = true }
 homepage = { workspace = true }
 repository = { workspace = true }

@@ -1,8 +1,10 @@
 [package]
 name = "descriptors"
 version = "0.10.0"
+description = "Bitcoin descriptors implementation"
 keywords = ["bitcoin", "wallet", "descriptors", "descriptor-wallet", "bip380"]
 categories = ["cryptography::cryptocurrencies", "encoding", "parsing"]
+readme = "README.md"
 authors = { workspace = true }
 homepage = { workspace = true }
 repository = { workspace = true }
