@@ -24,6 +24,7 @@
 extern crate amplify;
 
 mod indexes;
+pub mod standard;
 
 pub use indexes::{
     index_error, ChildIdx, DerivationIndex, HdnIdx, NormIdx, HARDENED_INDEX_BOUNDARY,
