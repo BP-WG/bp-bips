@@ -2,10 +2,12 @@
 members = [
     "derive",
     "psbt",
+    "descriptors"
 ]
 default-members = [
     "derive",
     "psbt",
+    "descriptors"
 ]
 
 [workspace.package]
