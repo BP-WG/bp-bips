@@ -448,6 +448,15 @@ impl ChildIdx {
     pub fn hardened_index(index: impl Into<u16>) -> Self {
         Self::Hardened(HdnIdx::from(index.into()))
     }
+
+    /// Infallible version of [`Self::from_raw_value`].
+    pub fn with_raw_value(raw: u32) -> Self {
+        if raw < HARDENED_INDEX_BOUNDARY {
+            NormIdx(raw).into()
+        } else {
+            HdnIdx(raw).into()
+        }
+    }
 }
 
 impl DerivationIndex for ChildIdx {
@@ -490,11 +499,7 @@ impl DerivationIndex for ChildIdx {
 
     #[inline]
     fn from_raw_value(value: u32) -> Result<Self, IndexUnsupported> {
-        if value < HARDENED_INDEX_BOUNDARY {
-            Ok(NormIdx(value).into())
-        } else {
-            Ok(HdnIdx(value).into())
-        }
+        Ok(Self::with_raw_value(value))
     }
 
     #[inline]

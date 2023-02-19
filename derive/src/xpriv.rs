@@ -19,17 +19,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#[macro_use]
-extern crate amplify;
-
-mod indexes;
-pub mod standard;
-mod xpub;
-#[cfg(feature = "private-keys")]
-mod xpriv;
-
-pub use indexes::{
-    index_error, ChildIdx, DerivationIndex, HdnIdx, NormIdx, HARDENED_INDEX_BOUNDARY,
-};
-pub use xpub::Chaincode;

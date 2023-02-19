@@ -30,6 +30,8 @@ jobs:
       fail-fast: false
       matrix:
         feature:
+          - secp256k1
+          - private-keys
     steps:
       - uses: actions/checkout@v2
       - name: Install rust stable
