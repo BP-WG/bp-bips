@@ -20,10 +20,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod addr;
-mod keys;
-mod expr;
-mod scripts;
-mod descr;
-mod derive;
-mod satisfy;
+pub trait AnyKey {}
+pub trait CompressedKey: AnyKey {}
+pub trait XonlyKey: AnyKey {}

@@ -20,10 +20,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod addr;
-mod keys;
-mod expr;
-mod scripts;
-mod descr;
-mod derive;
-mod satisfy;
+use amplify::confinement::TinyVec;
+
+use crate::expr::{KeyExpr, ScriptExpr, TapScriptExpr, TreeExpr, WScriptExpr};
+use crate::keys::{AnyKey, CompressedKey, XonlyKey};
+
+pub struct Pk<K: AnyKey>(KeyExpr<K>);
+
+pub struct Sh<S: ScriptExpr<K>, K: AnyKey>(S);
+
+pub struct Wpk<K: CompressedKey>(KeyExpr<K>);
+
+pub struct Wsh<S: ScriptExpr<K>, K: CompressedKey>(S);
+
+pub struct Tr<S: TapScriptExpr<K>, K: XonlyKey>(KeyExpr<K>, Option<TreeExpr<S, K>>);
+
+pub struct Multi<K: AnyKey>(u8, TinyVec<K>);
+impl<K: AnyKey> ScriptExpr<K> for Multi<K> {}
+impl<K: CompressedKey> WScriptExpr<K> for Multi<K> {}
+
+pub struct SortedMulti<K: AnyKey>(u8, TinyVec<K>);
+impl<K: AnyKey> ScriptExpr<K> for SortedMulti<K> {}
+impl<K: CompressedKey> WScriptExpr<K> for SortedMulti<K> {}
+
+pub struct Combo<K: AnyKey>(K);
+
+pub struct Raw(Vec<u8>);
+
+pub struct Addr(Address);

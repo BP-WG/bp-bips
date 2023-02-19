@@ -20,10 +20,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod addr;
-mod keys;
-mod expr;
-mod scripts;
-mod descr;
-mod derive;
-mod satisfy;
+use crate::derive::Descriptor;
+use crate::keys::AnyKey;
+
+pub enum Requirement<K: AnyKey> {
+    /// Constant value should pushed to the stack.
+    Const(Vec<u8>),
+    /// Value of variable with given name should pushed to the stack.
+    Var(String),
+    /// Signature on transaction with key `K` should pushed to the stack.
+    Signature(K),
+}
+
+pub trait SatisfiableDescriptor: Descriptor {
+    fn requirements(&self) -> Vec<Requirement<Descriptor::Key>>;
+}

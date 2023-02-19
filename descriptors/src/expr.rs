@@ -20,10 +20,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod addr;
-mod keys;
-mod expr;
-mod scripts;
-mod descr;
-mod derive;
-mod satisfy;
+//! Standard expressions used by descriptors
+
+use crate::keys::{AnyKey, CompressedKey, XonlyKey};
+
+pub struct KeyOrigin {
+    pub master_fp: Fingerprint,
+    pub derivation: DerivationPath,
+}
+
+pub struct KeyExpr<K: AnyKey> {
+    pub origin: Option<KeyOrigin>,
+    pub key: K,
+}
+
+pub trait ScriptExpr<K: AnyKey> {}
+pub trait WScriptExpr<K: CompressedKey> {}
+pub trait TapScriptExpr<K: XonlyKey>: ScriptExpr<K> {}
+
+pub enum NodeExpr<S: TapScriptExpr<K>, K: XonlyKey> {
+    TapScript(S),
+    NodeHash(TapNodeHash),
+    Tree(Box<TreeExpr<S, K>>),
+}
+
+pub struct TreeExpr<S: TapScriptExpr<K>, K: XonlyKey> {
+    pub first: NodeExpr<S, K>,
+    pub second: Option<NodeExpr<S, K>>,
+}
