@@ -1,0 +1,20 @@
+[package]
+name = "bitcoin_hd"
+version = "0.10.0"
+readme = "README.md"
+keywords = ["bitcoin", "wallet", "hd-wallet", "bip32", "bip44"]
+categories = ["cryptography::cryptocurrencies", "encoding", "parsing"]
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+
+[dependencies]
+amplify = { workspace = true }
+secp256k1 = { version = "0.26.0", features = ["global-context"], optional = true }
+
+[features]
+default = []
+all = ["secp256k1"]

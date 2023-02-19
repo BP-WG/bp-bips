@@ -1,8 +1,10 @@
 [workspace]
 members = [
-    "psbt"
+    "derive",
+    "psbt",
 ]
 default-members = [
+    "derive",
     "psbt",
 ]
 
