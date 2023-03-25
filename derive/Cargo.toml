@@ -14,11 +14,11 @@ license = { workspace = true }
 
 [dependencies]
 amplify = { workspace = true }
-secp256k1 = { version = "0.26.0", features = ["global-context"], optional = true }
+secp256k1 = { version = "0.27.0", features = ["global-context"] }
 base58 = "0.2.0" # TODO: Replace base58 with no-std implementation!
-bitcoin_hashes = "0.11.0" # TODO: Replace with different Ripemd160 implementation
+bitcoin_hashes = "0.12.0" # TODO: Replace with different Ripemd160 implementation
 
 [features]
 default = []
-all = ["secp256k1"]
+all = ["private-keys"]
 private-keys = []

@@ -25,6 +25,7 @@ extern crate amplify;
 
 mod indexes;
 pub mod standard;
+mod xkey;
 mod xpub;
 #[cfg(feature = "private-keys")]
 mod xpriv;
@@ -32,4 +33,7 @@ mod xpriv;
 pub use indexes::{
     index_error, ChildIdx, DerivationIndex, HdnIdx, NormIdx, HARDENED_INDEX_BOUNDARY,
 };
-pub use xpub::Chaincode;
+pub use xkey::{
+    Chaincode, Fingerprint, TooDeepDerivation, XkeyDecodeError, XkeyParseError, XKEY_LEN,
+};
+pub use xpub::{Xpub, XpubIdentifier};
