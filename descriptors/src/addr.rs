@@ -114,30 +114,24 @@ impl FromStr for Address {
 /// See also `descriptors::Compact` as a non-copy alternative supporting
 /// bare/custom scripts.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Display, From)]
-#[derive(StrictEncode, StrictDecode)]
 pub enum AddressPayload {
     /// P2PKH payload.
-    #[from]
     #[display("raw_pkh({0})")]
     PubkeyHash(Bytes20),
 
     /// P2SH and SegWit nested (legacy) P2WPKH/WSH-in-P2SH payloads.
-    #[from]
     #[display("raw_sh({0})")]
     ScriptHash(Bytes20),
 
     /// P2WPKH payload.
-    #[from]
     #[display("raw_wpkh({0})")]
     WPubkeyHash(Bytes20),
 
     /// P2WSH payload.
-    #[from]
     #[display("raw_wsh({0})")]
     WScriptHash(Bytes32),
 
     /// P2TR payload.
-    #[from]
     #[display("raw_tr({output_key})")]
     Taproot {
         /// Taproot output key (tweaked key)
@@ -300,7 +294,6 @@ impl FromStr for AddressFormat {
 
 /// Bitcoin network used by the address
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Display)]
-#[derive(StrictEncode, StrictDecode)]
 pub enum AddressNetwork {
     /// Bitcoin mainnet
     #[display("mainnet")]

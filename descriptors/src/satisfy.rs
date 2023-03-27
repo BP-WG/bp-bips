@@ -21,9 +21,9 @@
 // limitations under the License.
 
 use crate::derive::Descriptor;
-use crate::keys::AnyKey;
+use crate::keys::DescrKey;
 
-pub enum Requirement<K: AnyKey> {
+pub enum Requirement<K: DescrKey> {
     /// Constant value should pushed to the stack.
     Const(Vec<u8>),
     /// Value of variable with given name should pushed to the stack.

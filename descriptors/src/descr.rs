@@ -22,28 +22,29 @@
 
 use amplify::confinement::TinyVec;
 
-use crate::expr::{KeyExpr, ScriptExpr, TapScriptExpr, TreeExpr, WScriptExpr};
-use crate::keys::{AnyKey, CompressedKey, XonlyKey};
+use crate::addr::Address;
+use crate::expr::{KeyExpr, ScriptExpr, TapScriptExpr, TapretExpr, TreeExpr, WScriptExpr};
+use crate::keys::{CompressedKey, DescrKey, XonlyKey};
 
-pub struct Pk<K: AnyKey>(KeyExpr<K>);
+pub struct Pk<K>(KeyExpr<K>);
 
-pub struct Sh<S: ScriptExpr<K>, K: AnyKey>(S);
+pub struct Sh<K, S: ScriptExpr<K>>(S);
 
 pub struct Wpk<K: CompressedKey>(KeyExpr<K>);
 
-pub struct Wsh<S: ScriptExpr<K>, K: CompressedKey>(S);
+pub struct Wsh<K: CompressedKey, S: ScriptExpr<K>>(S);
 
-pub struct Tr<S: TapScriptExpr<K>, K: XonlyKey>(KeyExpr<K>, Option<TreeExpr<S, K>>);
+pub struct Tr<K: XonlyKey, S: TapScriptExpr<K>>(KeyExpr<K>, Option<TreeExpr<S, K>>, TapretExpr);
 
-pub struct Multi<K: AnyKey>(u8, TinyVec<K>);
-impl<K: AnyKey> ScriptExpr<K> for Multi<K> {}
+pub struct Multi<K>(u8, TinyVec<K>);
+impl<K> ScriptExpr<K> for Multi<K> {}
 impl<K: CompressedKey> WScriptExpr<K> for Multi<K> {}
 
-pub struct SortedMulti<K: AnyKey>(u8, TinyVec<K>);
-impl<K: AnyKey> ScriptExpr<K> for SortedMulti<K> {}
+pub struct SortedMulti<K>(u8, TinyVec<K>);
+impl<K> ScriptExpr<K> for SortedMulti<K> {}
 impl<K: CompressedKey> WScriptExpr<K> for SortedMulti<K> {}
 
-pub struct Combo<K: AnyKey>(K);
+pub struct Combo<K: DescrKey>(K);
 
 pub struct Raw(Vec<u8>);
 

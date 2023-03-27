@@ -22,19 +22,23 @@
 
 //! Standard expressions used by descriptors
 
-use crate::keys::{AnyKey, CompressedKey, XonlyKey};
+use std::collections::BTreeMap;
+
+use bc::TapNodeHash;
+
+use crate::keys::{CompressedKey, DescrKey, XonlyKey};
 
 pub struct KeyOrigin {
     pub master_fp: Fingerprint,
     pub derivation: DerivationPath,
 }
 
-pub struct KeyExpr<K: AnyKey> {
+pub struct KeyExpr<K: DescrKey> {
     pub origin: Option<KeyOrigin>,
     pub key: K,
 }
 
-pub trait ScriptExpr<K: AnyKey> {}
+pub trait ScriptExpr<K: DescrKey> {}
 pub trait WScriptExpr<K: CompressedKey> {}
 pub trait TapScriptExpr<K: XonlyKey>: ScriptExpr<K> {}
 
@@ -48,3 +52,5 @@ pub struct TreeExpr<S: TapScriptExpr<K>, K: XonlyKey> {
     pub first: NodeExpr<S, K>,
     pub second: Option<NodeExpr<S, K>>,
 }
+
+pub struct TapretExpr(BTreeMap<TerminalPath, Vec<mpc::Commitment>>);

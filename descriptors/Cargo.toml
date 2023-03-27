@@ -1,5 +1,5 @@
 [package]
-name = "descriptors"
+name = "bp-descriptor"
 version = "0.10.0"
 description = "Bitcoin descriptors implementation"
 keywords = ["bitcoin", "wallet", "descriptors", "descriptor-wallet", "bip380"]

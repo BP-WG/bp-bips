@@ -20,6 +20,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub trait AnyKey {}
-pub trait CompressedKey: AnyKey {}
-pub trait XonlyKey: AnyKey {}
+pub trait CompressedKey {}
+pub trait XonlyKey {}

@@ -20,44 +20,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::keys::AnyKey;
+use bc::ScriptPubkey;
 
-pub enum DeriveError {
-    HardenedIndex,
-    PatternMismatch,
+use crate::addr::Address;
+use crate::keys::DescrKey;
+
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Display, Error)]
+#[display(doc_comments)]
+pub enum DerivatorError {
+    /// derivation path length exceeded maximum 255 elements.
+    TooDeep,
+
+    /// attempt to derive key using variable index at unknown position {0}.
+    UnknownPosition(u8),
 }
 
-pub trait ConcretePubkey: AnyKey {}
-pub trait DerivePubkey: AnyKey {
-    type ConcreteKey: AnyKey;
+pub trait TerminalDerivator {
+    fn index_at(&self, pos: u8) -> Result<NormIndex, DerivatorError>;
+}
+
+pub trait ConcretePubkey {}
+pub trait DerivePubkey {
+    type ConcreteKey: DescrKey;
     fn derive_pattern_len(&self) -> u8;
     fn derive_pubkey(
         &self,
-        pattern: impl IntoIterator<Item = NormIndex>,
-    ) -> Result<Self::ConcreteKey, DeriveError>;
+        derivator: &impl TerminalDerivator,
+    ) -> Result<Self::ConcreteKey, DerivatorError>;
 }
 
-pub trait Descriptor {
-    type Key: AnyKey;
-
+pub trait Descriptor<Key> {
     fn derive_script_pubkey(
         &self,
-        pattern: impl IntoIterator<Item = NormIndex>,
-    ) -> Result<ScriptPubkey, DeriveError>
+        derivator: &impl TerminalDerivator,
+    ) -> Result<ScriptPubkey, DerivatorError>
     where
-        Self::Key: DerivePubkey;
+        Key: DerivePubkey;
 
     fn script_pubkey(&self) -> ScriptPubkey
     where Self::Key: ConcretePubkey;
 
     fn derive_address(
         &self,
-        pattern: impl IntoIterator<Item = NormIndex>,
-    ) -> Result<ScriptPubkey, DeriveError>
+        derivator: &impl TerminalDerivator,
+    ) -> Result<ScriptPubkey, DerivatorError>
     where
-        Self::Key: DerivePubkey,
+        Key: DerivePubkey,
     {
-        self.derive_script_pubkey(pattern).map(Address::into)
+        self.derive_script_pubkey(derivator).map(Address::into)
     }
 
     fn address(&self) -> Address

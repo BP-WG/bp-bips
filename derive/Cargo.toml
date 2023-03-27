@@ -1,5 +1,5 @@
 [package]
-name = "bitcoin_hd"
+name = "bp-derive"
 version = "0.10.0"
 description = "Bitcoin hierarchical deterministic derivation library"
 keywords = ["bitcoin", "wallet", "hd-wallet", "bip32", "bip44"]

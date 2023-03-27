@@ -83,7 +83,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "bitcoin_hd"
+name = "bitflags"
+version = "1.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
+
+[[package]]
+name = "bp-derive"
 version = "0.10.0"
 dependencies = [
  "amplify",
@@ -93,10 +99,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "bitflags"
-version = "1.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
+name = "bp-descriptor"
+version = "0.10.0"
+dependencies = [
+ "amplify",
+ "bp-primitives",
+ "secp256k1 0.26.0",
+]
 
 [[package]]
 name = "bp-primitives"
@@ -145,15 +154,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b49ba7ef1ad6107f8824dbe97de947cbaac53c44e7f9756a1fba0d37c1eec505"
 dependencies = [
  "memchr",
-]
-
-[[package]]
-name = "descriptors"
-version = "0.10.0"
-dependencies = [
- "amplify",
- "bp-primitives",
- "secp256k1 0.26.0",
 ]
 
 [[package]]
